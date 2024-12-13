@@ -80,6 +80,43 @@ public int getDateAddress() {
     }
 ```
 
+### Self-encapsulate field
+در کلاس CodeGenerator تعدادی قیلد private وجود دارد که به طور مستقیم توسط متدهای این کلاس استفاده می‌شوند. می‌توانیم این فیلدها را encapsulate کنیم:
+`` java
+    private Memory memory = new Memory();
+    private Stack<Address> ss = new Stack<Address>();
+    private Stack<String> symbolStack = new Stack<>();
+    private Stack<String> callStack = new Stack<>();
+    private SymbolTable symbolTable;
+```
+پس از افزودن متدهای getter داریم:
+```java
+private Memory memory = new Memory();
+    private Stack<Address> ss = new Stack<Address>();
+    private Stack<String> symbolStack = new Stack<>();
+    private Stack<String> callStack = new Stack<>();
+    private SymbolTable symbolTable;
+
+    public Memory getMemory() {
+        return memory;
+    }
+
+    public Stack<Address> getSs() {
+        return ss;
+    }
+
+    public Stack<String> getSymbolStack() {
+        return symbolStack;
+    }
+
+    public Stack<String> getCallStack() {
+        return callStack;
+    }
+
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+```
 
 ## سوالات
 
