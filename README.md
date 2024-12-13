@@ -49,3 +49,72 @@ parseTable = ParseTableFacade.createParseTableFromFile("src/main/resources/parse
 ```
 
 
+## سوالات
+
+
+### سوال ۴
+
+برای مثال کد [Phase2CodeFileManipulator.java](https://github.com/bigsheykh/Convert_UML_to_ANSI_C/blob/master/src/com/project/phase2CodeGeneration/Phase2CodeFileManipulator.java) را در نظر می‌گیریم:
+
+1. Bloaters
+
+Long Method:
+
+متد generatePhase2 بسیار طولانی است و مسئولیت‌های متعددی دارد، که باعث دشواری در درک و تست آن می‌شود. این متد می‌تواند به چند متد کوچکتر تقسیم شود که هر کدام یک بخش مشخص از مسئولیت را انجام دهند.
+متدهای دیگر نظیر methodCallHandler و generatePhase2 نیز بزرگ هستند و نیاز به refactoring دارند.
+
+
+Large Class:
+
+کلاس Phase2CodeFileManipulator بسیار بزرگ است و وظایف مختلفی را انجام می‌دهد. این کلاس می‌تواند به چندین کلاس کوچک‌تر تقسیم شود که هر کدام یک بخش خاص از فرآیند مدیریت فایل‌های فاز دوم را انجام دهند.
+
+
+Primitive Obsession:
+
+استفاده از مقادیر ابتدایی مانند int برای مواردی نظیر depthOfParenthesis و depthOfCurlyBracket می‌تواند با کلاس‌های انتزاعی‌تر یا enumهای جدید جایگزین شود.
+
+
+2. Object-Orientation Abusers
+
+Switch Statements:
+
+در متد generatePhase2 از یک بلوک بزرگ switch استفاده شده است که نشانه‌ای از نقض اصل شیءگرایی است. این کد می‌تواند با استفاده از الگوی استراتژی (Strategy Pattern) یا متدهای پلی‌مورفیک جایگزین شود.
+
+
+3. Change Preventers
+
+
+Divergent Change:
+
+هرگونه تغییر در نحوه مدیریت توکن‌ها یا ساختار کلاس‌ها مستلزم تغییرات گسترده در متدهای متعدد مانند generatePhase2 و متدهای مرتبط است.
+
+
+4. Dispensables
+
+
+Comments:
+
+وجود کامنت‌هایی که صرفاً توضیح‌دهنده‌ی عملکرد مستقیم کد هستند، مانند // else freeKeyword، می‌تواند نشانه‌ای از عدم خود مستند بودن کد باشد. با انتخاب نام‌های واضح‌تر برای متغیرها و متدها، می‌توان نیاز به این کامنت‌ها را کاهش داد.
+
+
+Dead Code:
+
+کدهای کامنت‌شده نظیر // else freeKeyword و بخش‌هایی که دیگر مورد استفاده قرار نمی‌گیرند باید حذف شوند.
+
+
+Speculative Generality:
+
+متدها و مقادیر خاصی وجود دارند که به نظر می‌رسد برای کاربردهای احتمالی آینده طراحی شده‌اند اما در حال حاضر استفاده‌ای ندارند، نظیر برخی شمارنده‌ها.
+
+
+5. Couplers
+
+
+Feature Envy:
+
+برخی متدها مانند generatePhase2 بیش از حد به جزئیات داخلی DiagramInfo و LexicalAnalyzer وابسته هستند. این وابستگی‌ها را می‌توان با انتقال برخی وظایف به این کلاس‌ها کاهش داد.
+
+
+Message Chains:
+
+دسترسی زنجیره‌ای به متدها و مقادیر، مانند diagramInfo.isHaveDestructor(attribute.getValueType().getTypeName())، می‌تواند نشان‌دهنده‌ی وابستگی زیاد به ساختار داخلی کلاس‌های دیگر باشد.
