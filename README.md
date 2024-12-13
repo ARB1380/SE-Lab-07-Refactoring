@@ -48,6 +48,38 @@ parseTable = ParseTableFacade.createParseTableFromFile("src/main/resources/parse
 
 ```
 
+### separate query from modifier
+در متدهای زیر مقدار یک متغیر هم دارد تغییر می‌کند و هم باز گردانده می‌شود:
+```java
+public int getTemp() {
+    lastTempIndex += tempSize;
+    return lastTempIndex - tempSize;
+}
+
+public int getDateAddress() {
+    lastDataAddress += dataSize;
+    return lastDataAddress - dataSize;
+}
+```
+هر بار صدا شدن این دو تابع را با توابع زیر جایگزین می‌کنیم:
+```java
+    public int getTemp() {
+        return lastTempIndex;
+    }
+
+    public void updateTemp() {
+        lastTempIndex += tempSize;
+    }
+
+    public int getDataAddress() {
+        return lastDataAddress;
+    }
+
+    public void updateDataAddress() {
+        lastDataAddress += dataSize;
+    }
+```
+
 
 ## سوالات
 
