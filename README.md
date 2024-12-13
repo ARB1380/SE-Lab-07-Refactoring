@@ -48,6 +48,75 @@ parseTable = ParseTableFacade.createParseTableFromFile("src/main/resources/parse
 
 ```
 
+### separate query from modifier
+در متدهای زیر مقدار یک متغیر هم دارد تغییر می‌کند و هم باز گردانده می‌شود:
+```java
+public int getTemp() {
+    lastTempIndex += tempSize;
+    return lastTempIndex - tempSize;
+}
+
+public int getDateAddress() {
+    lastDataAddress += dataSize;
+    return lastDataAddress - dataSize;
+}
+```
+هر بار صدا شدن این دو تابع را با توابع زیر جایگزین می‌کنیم:
+```java
+    public int getTemp() {
+        return lastTempIndex;
+    }
+
+    public void updateTemp() {
+        lastTempIndex += tempSize;
+    }
+
+    public int getDataAddress() {
+        return lastDataAddress;
+    }
+
+    public void updateDataAddress() {
+        lastDataAddress += dataSize;
+    }
+```
+
+### Self-encapsulate field
+در کلاس CodeGenerator تعدادی قیلد private وجود دارد که به طور مستقیم توسط متدهای این کلاس استفاده می‌شوند. می‌توانیم این فیلدها را encapsulate کنیم:
+```java
+    private Memory memory = new Memory();
+    private Stack<Address> ss = new Stack<Address>();
+    private Stack<String> symbolStack = new Stack<>();
+    private Stack<String> callStack = new Stack<>();
+    private SymbolTable symbolTable;
+```
+پس از افزودن متدهای getter داریم:
+```java
+private Memory memory = new Memory();
+    private Stack<Address> ss = new Stack<Address>();
+    private Stack<String> symbolStack = new Stack<>();
+    private Stack<String> callStack = new Stack<>();
+    private SymbolTable symbolTable;
+
+    public Memory getMemory() {
+        return memory;
+    }
+
+    public Stack<Address> getSs() {
+        return ss;
+    }
+
+    public Stack<String> getSymbolStack() {
+        return symbolStack;
+    }
+
+    public Stack<String> getCallStack() {
+        return callStack;
+    }
+
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+```
 
 ## سوالات
 
