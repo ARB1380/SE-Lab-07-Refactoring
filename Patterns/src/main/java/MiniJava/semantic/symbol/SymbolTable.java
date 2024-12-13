@@ -36,7 +36,8 @@ public class SymbolTable {
     }
 
     public void addField(String fieldName, String className) {
-        klasses.get(className).Fields.put(fieldName, new Symbol(lastType, mem.getDateAddress()));
+        klasses.get(className).Fields.put(fieldName, new Symbol(lastType, mem.getDataAddress()));
+        mem.updateDataAddress();
     }
 
     public void addMethod(String className, String methodName, int address) {
@@ -55,7 +56,8 @@ public class SymbolTable {
         if (klasses.get(className).Methodes.get(methodName).localVariable.containsKey(localVariableName)) {
             ErrorHandler.printError("This variable already defined");
         }
-        klasses.get(className).Methodes.get(methodName).localVariable.put(localVariableName, new Symbol(lastType, mem.getDateAddress()));
+        klasses.get(className).Methodes.get(methodName).localVariable.put(localVariableName, new Symbol(lastType, mem.getDataAddress()));
+        mem.updateDataAddress();
 //        }catch (NullPointerException e){
 //            e.printStackTrace();
 //        }
@@ -155,8 +157,10 @@ public class SymbolTable {
             this.codeAddress = codeAddress;
             this.returnType = returnType;
             this.orderdParameters = new ArrayList<>();
-            this.returnAddress = mem.getDateAddress();
-            this.callerAddress = mem.getDateAddress();
+            this.returnAddress = mem.getDataAddress();
+            mem.updateDataAddress();
+            this.callerAddress = mem.getDataAddress();
+            mem.updateDataAddress();
             this.parameters = new HashMap<>();
             this.localVariable = new HashMap<>();
         }
@@ -168,7 +172,8 @@ public class SymbolTable {
         }
 
         public void addParameter(String parameterName) {
-            parameters.put(parameterName, new Symbol(lastType, mem.getDateAddress()));
+            parameters.put(parameterName, new Symbol(lastType, mem.getDataAddress()));
+            mem.updateDataAddress();
             orderdParameters.add(parameterName);
         }
 

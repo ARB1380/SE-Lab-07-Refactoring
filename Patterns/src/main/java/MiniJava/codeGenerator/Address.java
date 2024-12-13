@@ -21,6 +21,12 @@ public class Address {
         this.varType = varType;
     }
 
+    public static Address createTempAddress(Memory memory, varType varType) {
+        int temp = memory.getTemp();
+        memory.updateTemp();
+        return new Address(temp, varType);
+    }
+
     public String toString() {
         switch (Type) {
             case Direct:
