@@ -329,6 +329,18 @@ private final ArrayList<Map<Token, Action>> actionTable = new ArrayList<>();
 ## سوالات
 
 
+### سوال ۲
+۱- دسته‌ی bloaters:
+متدها یا کلاس‌هایی که بیش از اندازه بزرگ شده‌اند به طوری که فهم و تغییر آنها بسیار دشوار است.
+۲- دسته‌ی Object orientation abusers:
+استفاده‌های نادرست از مفاهیم شی گرایی در نوشتن برنامه به گونه‌ای که خوانایی و درک کد را سخت می‌کند.
+۳- دسته‌ی change preventers:
+کدی که به نحوی زده شده که جلوی تغییر دادن کد را بگیرد و تغییر را سحت کند. مثلا این که لازم باشد برای یک تغییر به ظاهر کوچک نقاط زیادی از کد را تغییر دهیم.
+۴- دسته‌ی dispensables:
+بخش‌هایی از کد که کارایی خوبی ندارند و می‌توانند بدون آسیب زدن به کدبیس حذف شوند و تنها کار توسعه را سخت می‌کنند.
+۵- دسته‌ی couplers:
+بوهایی که باعث کاپلینگ بالا و وابستگی زیادی اجزای کد به یکدیکر می‌شود.
+
 ### سوال ۴
 
 برای مثال کد [Phase2CodeFileManipulator.java](https://github.com/bigsheykh/Convert_UML_to_ANSI_C/blob/master/src/com/project/phase2CodeGeneration/Phase2CodeFileManipulator.java) را در نظر می‌گیریم:
