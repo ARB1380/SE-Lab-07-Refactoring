@@ -118,8 +118,228 @@ private Memory memory = new Memory();
     }
 ```
 
+### Custom refactors
+کلاس ParseTable را در نظر می‌گیریم که یک Constructor بسیار بزرگ دارد که از پیچیدگی زیادی برخوردر است.
+```java
+    private ArrayList<Map<Token, Action>> actionTable;
+
+    private ArrayList<Map<NonTerminal, Integer>> gotoTable;
+
+    public ParseTable(String jsonTable) throws Exception {
+        jsonTable = jsonTable.substring(2, jsonTable.length() - 2);
+        String[] Rows = jsonTable.split("\\],\\[");
+        Map<Integer, Token> terminals = new HashMap<Integer, Token>();
+        Map<Integer, NonTerminal> nonTerminals = new HashMap<Integer, NonTerminal>();
+        Rows[0] = Rows[0].substring(1, Rows[0].length() - 1);
+        String[] cols = Rows[0].split("\",\"");
+        for (int i = 1; i < cols.length; i++) {
+            if (cols[i].startsWith("Goto")) {
+                String temp = cols[i].substring(5);
+                try {
+                    nonTerminals.put(i, NonTerminal.valueOf(temp));
+                } catch (Exception e) {
+                    ErrorHandler.printError(e.getMessage());
+                }
+            } else {
+                terminals.put(i, new Token(Token.getTyepFormString(cols[i]), cols[i]));
+            }
+        }
+        actionTable = new ArrayList<Map<Token, Action>>();
+        gotoTable = new ArrayList<Map<NonTerminal, Integer>>();
+        for (int i = 1; i < Rows.length; i++) {
+            Rows[i] = Rows[i].substring(1, Rows[i].length() - 1);
+            cols = Rows[i].split("\",\"");
+            actionTable.add(new HashMap<Token, Action>());
+            gotoTable.add(new HashMap<>());
+            for (int j = 1; j < cols.length; j++) {
+                if (!cols[j].equals("")) {
+                    if (cols[j].equals("acc")) {
+                        actionTable.get(actionTable.size() - 1).put(terminals.get(j), new Action(act.accept, 0));
+                    } else if (terminals.containsKey(j)) {
+                        Token t = terminals.get(j);
+                        Action a = new Action(cols[j].charAt(0) == 'r' ? act.reduce : act.shift, Integer.parseInt(cols[j].substring(1)));
+                        actionTable.get(actionTable.size() - 1).put(t, a);]
+                    } else if (nonTerminals.containsKey(j)) {
+                        gotoTable.get(gotoTable.size() - 1).put(nonTerminals.get(j), Integer.parseInt(cols[j]));
+                    } else {
+                        throw new Exception();
+                    }
+                }
+            }
+        }
+    }
+```
+در ظی چند مرحله با چند ریفکتور این کانستراکتور را مرتب می‌کنیم.
+۱- مراحل ایجاد هر کدام از متغیرهای لوکال constructor را جدا کنیم:
+```java
+    private final ArrayList<Map<Token, Action>> actionTable = new ArrayList<>();
+    private final ArrayList<Map<NonTerminal, Integer>> gotoTable = new ArrayList<>();
+
+    public ParseTable(String jsonTable) throws Exception {
+        jsonTable = jsonTable.substring(2, jsonTable.length() - 2);
+
+//      init Rows
+        String[] Rows = jsonTable.split("],\\[");
+        for (int i = 0; i < Rows.length; i++)
+            Rows[i] = Rows[i].substring(1, Rows[i].length() - 1);
+
+//      init cols
+        String[] cols = Rows[0].split("\",\"");
+
+//      init terminals
+        Map<Integer, Token> terminals = new HashMap<>();
+        for (int i = 1; i < cols.length; i++) {
+            if (!cols[i].startsWith("Goto")) {
+                terminals.put(i, new Token(Token.getTyepFormString(cols[i]), cols[i]));
+            }
+        }
+
+//      init nonTerminals
+        Map<Integer, NonTerminal> nonTerminals = new HashMap<>();
+        for (int i = 1; i < cols.length; i++) {
+            if (cols[i].startsWith("Goto")) {
+                String temp = cols[i].substring(5);
+                try {
+                    nonTerminals.put(i, NonTerminal.valueOf(temp));
+                } catch (Exception e) {
+                    ErrorHandler.printError(e.getMessage());
+                }
+            }
+        }
+
+        //init action table
+        for (int i = 1; i < Rows.length; i++) {
+            String[] columns = Rows[i].split("\",\"");
+            actionTable.add(new HashMap<>());
+            for (int j = 1; j < columns.length; j++) {
+                if (!columns[j].isEmpty()) {
+                    if (columns[j].equals("acc")) {
+                        actionTable.get(actionTable.size() - 1).put(terminals.get(j), new Action(act.accept, 0));
+                    } else if (terminals.containsKey(j)) {
+                        Token t = terminals.get(j);
+                        Action a = new Action(columns[j].charAt(0) == 'r' ? act.reduce : act.shift, Integer.parseInt(columns[j].substring(1)));
+                        actionTable.get(actionTable.size() - 1).put(t, a);
+                    } else if (!nonTerminals.containsKey(j)) {
+                        throw new Exception();
+                    }
+                }
+            }
+        }
+
+        // init goto table
+        for (int i = 1; i < Rows.length; i++) {
+            String[] columns = Rows[i].split("\",\"");
+
+            gotoTable.add(new HashMap<>());
+            for (int j = 1; j < columns.length; j++) {
+                if (!columns[j].isEmpty()) {
+                    if (!columns[j].equals("acc") && !terminals.containsKey(j) && nonTerminals.containsKey(j)) {
+                        gotoTable.get(gotoTable.size() - 1).put(nonTerminals.get(j), Integer.parseInt(columns[j]));
+                    } else {
+                        throw new Exception();
+                    }
+                }
+            }
+        }
+    }
+```
+در نهایت با extract function می‌توان خوانایی کد را بهبود بخشید:
+```java
+private final ArrayList<Map<Token, Action>> actionTable = new ArrayList<>();
+    private final ArrayList<Map<NonTerminal, Integer>> gotoTable = new ArrayList<>();
+
+    public ParseTable(String jsonTable) throws Exception {
+        jsonTable = jsonTable.substring(2, jsonTable.length() - 2);
+        
+        String[] Rows = jsonTable.split("],\\[");
+        for (int i = 0; i < Rows.length; i++)
+            Rows[i] = Rows[i].substring(1, Rows[i].length() - 1);
+
+        String[] cols = Rows[0].split("\",\"");
+        
+        Map<Integer, Token> terminals = initTerminals(cols);
+        Map<Integer, NonTerminal> nonTerminals = initNonTerminals(cols);
+
+        initActionTable(Rows, terminals, nonTerminals);
+        initGotoTable(Rows, terminals, nonTerminals);
+    }
+
+    private static Map<Integer, Token> initTerminals(String[] cols) {
+        Map<Integer, Token> terminals = new HashMap<>();
+        for (int i = 1; i < cols.length; i++) {
+            if (!cols[i].startsWith("Goto")) {
+                terminals.put(i, new Token(Token.getTyepFormString(cols[i]), cols[i]));
+            }
+        }
+        return terminals;
+    }
+
+    private Map<Integer, NonTerminal> initNonTerminals(String[] cols) {
+        Map<Integer, NonTerminal> nonTerminals = new HashMap<>();
+        for (int i = 1; i < cols.length; i++) {
+            if (cols[i].startsWith("Goto")) {
+                String temp = cols[i].substring(5);
+                try {
+                    nonTerminals.put(i, NonTerminal.valueOf(temp));
+                } catch (Exception e) {
+                    ErrorHandler.printError(e.getMessage());
+                }
+            }
+        }
+        return nonTerminals;
+    }
+
+    private void initGotoTable(String[] Rows, Map<Integer, Token> terminals, Map<Integer, NonTerminal> nonTerminals) throws Exception {
+        for (int i = 1; i < Rows.length; i++) {
+            String[] columns = Rows[i].split("\",\"");
+
+            gotoTable.add(new HashMap<>());
+            for (int j = 1; j < columns.length; j++) {
+                if (!columns[j].isEmpty()) {
+                    if (!columns[j].equals("acc") && !terminals.containsKey(j) && nonTerminals.containsKey(j)) {
+                        gotoTable.get(gotoTable.size() - 1).put(nonTerminals.get(j), Integer.parseInt(columns[j]));
+                    } else {
+                        throw new Exception();
+                    }
+                }
+            }
+        }
+    }
+
+    private void initActionTable(String[] Rows, Map<Integer, Token> terminals, Map<Integer, NonTerminal> nonTerminals) throws Exception {
+        for (int i = 1; i < Rows.length; i++) {
+            String[] columns = Rows[i].split("\",\"");
+            actionTable.add(new HashMap<>());
+            for (int j = 1; j < columns.length; j++) {
+                if (!columns[j].isEmpty()) {
+                    if (columns[j].equals("acc")) {
+                        actionTable.get(actionTable.size() - 1).put(terminals.get(j), new Action(act.accept, 0));
+                    } else if (terminals.containsKey(j)) {
+                        Token t = terminals.get(j);
+                        Action a = new Action(columns[j].charAt(0) == 'r' ? act.reduce : act.shift, Integer.parseInt(columns[j].substring(1)));
+                        actionTable.get(actionTable.size() - 1).put(t, a);
+                    } else if (!nonTerminals.containsKey(j)) {
+                        throw new Exception();
+                    }
+                }
+            }
+        }
+    }
+```
 ## سوالات
 
+
+### سوال ۲
+۱- دسته‌ی bloaters:
+متدها یا کلاس‌هایی که بیش از اندازه بزرگ شده‌اند به طوری که فهم و تغییر آنها بسیار دشوار است.
+۲- دسته‌ی Object orientation abusers:
+استفاده‌های نادرست از مفاهیم شی گرایی در نوشتن برنامه به گونه‌ای که خوانایی و درک کد را سخت می‌کند.
+۳- دسته‌ی change preventers:
+کدی که به نحوی زده شده که جلوی تغییر دادن کد را بگیرد و تغییر را سحت کند. مثلا این که لازم باشد برای یک تغییر به ظاهر کوچک نقاط زیادی از کد را تغییر دهیم.
+۴- دسته‌ی dispensables:
+بخش‌هایی از کد که کارایی خوبی ندارند و می‌توانند بدون آسیب زدن به کدبیس حذف شوند و تنها کار توسعه را سخت می‌کنند.
+۵- دسته‌ی couplers:
+بوهایی که باعث کاپلینگ بالا و وابستگی زیادی اجزای کد به یکدیکر می‌شود.
 
 ### سوال ۴
 
