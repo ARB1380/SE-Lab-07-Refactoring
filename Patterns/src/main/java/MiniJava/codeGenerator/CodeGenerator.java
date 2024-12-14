@@ -7,6 +7,8 @@ import MiniJava.semantic.symbol.Symbol;
 import MiniJava.semantic.symbol.SymbolTable;
 import MiniJava.semantic.symbol.SymbolType;
 
+import java.MiniJava.codeGenerator.*;
+import java.util.HashMap;
 import java.util.Stack;
 
 /**
@@ -39,9 +41,45 @@ public class CodeGenerator {
         return symbolTable;
     }
 
+    public HashMap<Integer, Action> numberToAction;
+
     public CodeGenerator() {
         symbolTable = new SymbolTable(getMemory());
         //TODO
+        numberToAction = new HashMap<>();
+        numberToAction.put(1, new CheckIdAction());
+        numberToAction.put(2, new PidAction());
+        numberToAction.put(3, new FPidAction());
+        numberToAction.put(4, new KPidAction());
+        numberToAction.put(5, new IntPidAction());
+        numberToAction.put(6, new StartCallAction());
+        numberToAction.put(7, new CallAction());
+        numberToAction.put(8, new ArgAction());
+        numberToAction.put(9, new AssignAction());
+        numberToAction.put(10, new AddAction());
+        numberToAction.put(11, new SubAction());
+        numberToAction.put(12, new MultAction());
+        numberToAction.put(13, new LabelAction());
+        numberToAction.put(14, new SaveAction());
+        numberToAction.put(15, new WhileAction());
+        numberToAction.put(16, new JpfSaveAction());
+        numberToAction.put(17, new JpHereAction());
+        numberToAction.put(18, new PrintAction());
+        numberToAction.put(19, new EqualAction());
+        numberToAction.put(20, new LessThanAction());
+        numberToAction.put(21, new AndAction());
+        numberToAction.put(22, new NotAction());
+        numberToAction.put(23, new DefClassAction());
+        numberToAction.put(24, new DefMethodAction());
+        numberToAction.put(25, new PopClassAction());
+        numberToAction.put(26, new ExtendAction());
+        numberToAction.put(27, new DefFieldAction());
+        numberToAction.put(28, new DefVarAction());
+        numberToAction.put(29, new MethodReturnAction());
+        numberToAction.put(30, new DefParamAction());
+        numberToAction.put(31, new LastTypeBoolAction());
+        numberToAction.put(32, new LastTypeIntAction());
+        numberToAction.put(33, new DefMainAction());
     }
 
     public void printMemory() {
@@ -50,112 +88,116 @@ public class CodeGenerator {
 
     public void semanticFunction(int func, Token next) {
         Log.print("codegenerator : " + func);
-        switch (func) {
-            case 0:
-                return;
-            case 1:
-                checkID();
-                break;
-            case 2:
-                pid(next);
-                break;
-            case 3:
-                fpid();
-                break;
-            case 4:
-                kpid(next);
-                break;
-            case 5:
-                intpid(next);
-                break;
-            case 6:
-                startCall();
-                break;
-            case 7:
-                call();
-                break;
-            case 8:
-                arg();
-                break;
-            case 9:
-                assign();
-                break;
-            case 10:
-                add();
-                break;
-            case 11:
-                sub();
-                break;
-            case 12:
-                mult();
-                break;
-            case 13:
-                label();
-                break;
-            case 14:
-                save();
-                break;
-            case 15:
-                _while();
-                break;
-            case 16:
-                jpf_save();
-                break;
-            case 17:
-                jpHere();
-                break;
-            case 18:
-                print();
-                break;
-            case 19:
-                equal();
-                break;
-            case 20:
-                less_than();
-                break;
-            case 21:
-                and();
-                break;
-            case 22:
-                not();
-                break;
-            case 23:
-                defClass();
-                break;
-            case 24:
-                defMethod();
-                break;
-            case 25:
-                popClass();
-                break;
-            case 26:
-                extend();
-                break;
-            case 27:
-                defField();
-                break;
-            case 28:
-                defVar();
-                break;
-            case 29:
-                methodReturn();
-                break;
-            case 30:
-                defParam();
-                break;
-            case 31:
-                lastTypeBool();
-                break;
-            case 32:
-                lastTypeInt();
-                break;
-            case 33:
-                defMain();
-                break;
+        Action action = numberToAction.get(func);
+        if(action != null){
+            action.executeAction(this, next);
         }
+        //        switch (func) {
+//            case 0:
+//                return;
+//            case 1:
+//                checkID();
+//                break;
+//            case 2:
+//                pid(next);
+//                break;
+//            case 3:
+//                fpid();
+//                break;
+//            case 4:
+//                kpid(next);
+//                break;
+//            case 5:
+//                intpid(next);
+//                break;
+//            case 6:
+//                startCall();
+//                break;
+//            case 7:
+//                call();
+//                break;
+//            case 8:
+//                arg();
+//                break;
+//            case 9:
+//                assign();
+//                break;
+//            case 10:
+//                add();
+//                break;
+//            case 11:
+//                sub();
+//                break;
+//            case 12:
+//                mult();
+//                break;
+//            case 13:
+//                label();
+//                break;
+//            case 14:
+//                save();
+//                break;
+//            case 15:
+//                _while();
+//                break;
+//            case 16:
+//                jpf_save();
+//                break;
+//            case 17:
+//                jpHere();
+//                break;
+//            case 18:
+//                print();
+//                break;
+//            case 19:
+//                equal();
+//                break;
+//            case 20:
+//                less_than();
+//                break;
+//            case 21:
+//                and();
+//                break;
+//            case 22:
+//                not();
+//                break;
+//            case 23:
+//                defClass();
+//                break;
+//            case 24:
+//                defMethod();
+//                break;
+//            case 25:
+//                popClass();
+//                break;
+//            case 26:
+//                extend();
+//                break;
+//            case 27:
+//                defField();
+//                break;
+//            case 28:
+//                defVar();
+//                break;
+//            case 29:
+//                methodReturn();
+//                break;
+//            case 30:
+//                defParam();
+//                break;
+//            case 31:
+//                lastTypeBool();
+//                break;
+//            case 32:
+//                lastTypeInt();
+//                break;
+//            case 33:
+//                defMain();
+//                break;
+//        }
     }
 
-    private void defMain() {
+    public void defMain() {
         //getSs().pop();
         getMemory().add3AddressCode(getSs().pop().num, Operation.JP, new Address(getMemory().getCurrentCodeBlockAddress(), varType.Address), null, null);
         String methodName = "main";
