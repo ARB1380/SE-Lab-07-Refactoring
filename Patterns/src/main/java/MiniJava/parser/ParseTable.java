@@ -63,7 +63,8 @@ public class ParseTable {
             gotoTable.add(new HashMap<>());
             for (int j = 1; j < columns.length; j++) {
                 if (!columns[j].isEmpty()) {
-                    if (!columns[j].equals("acc") && !terminals.containsKey(j) && nonTerminals.containsKey(j)) {
+                    if (columns[j].equals("acc") || terminals.containsKey(j)) {
+                    } else if (nonTerminals.containsKey(j)) {
                         gotoTable.get(gotoTable.size() - 1).put(nonTerminals.get(j), Integer.parseInt(columns[j]));
                     } else {
                         throw new Exception();
