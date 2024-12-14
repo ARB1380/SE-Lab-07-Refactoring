@@ -7,7 +7,6 @@ import MiniJava.semantic.symbol.Symbol;
 import MiniJava.semantic.symbol.SymbolTable;
 import MiniJava.semantic.symbol.SymbolType;
 
-import java.MiniJava.codeGenerator.*;
 import java.util.HashMap;
 import java.util.Stack;
 

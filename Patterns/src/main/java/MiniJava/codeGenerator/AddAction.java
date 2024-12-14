@@ -1,6 +1,5 @@
-package java.MiniJava.codeGenerator;
+package MiniJava.codeGenerator;
 
-import MiniJava.codeGenerator.CodeGenerator;
 import MiniJava.scanner.token.Token;
 
 public class AddAction implements Action {
