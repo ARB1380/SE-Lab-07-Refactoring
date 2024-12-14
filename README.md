@@ -47,7 +47,72 @@ parseTable = new ParseTable(Files.readAllLines(Paths.get("src/main/resources/par
 parseTable = ParseTableFacade.createParseTableFromFile("src/main/resources/parseTable");
 
 ```
+### Strategy
+سومین مورد بازآرایی خواسته شده از ما در این پروژه مربوط به این مورد بود که در کلاس code generator و تابع semantic function تعداد 33 مورد case وجود داشت که برای بازآرایی از این تکنیک استفاده شده است. در اینجا یک interface به نام action تعریف شده است و متد execute action در آن نهادینه شده است که در واقع همان تابع مربوطه در code generator صدا زده می شود. همچنین به ازای هرکدام از آن متدها یک class مجزا تعریف شده است که از این interface استفاده می کند و تابع مربوط به خودش را در execute action صدا می زند. در زیر می توان interface و همچنین یکی از کلاس های نمونه را مشاهده کرد. 
+```java
+public interface Action {
+    void executeAction(CodeGenerator codeGenerator, Token next);
+}
+```
+```java
+public class AddAction implements Action {
+    @Override
+    public void executeAction(CodeGenerator codeGenerator, Token next) {
+        codeGenerator.add();
+    }
+}
+```
+حال در خود کلاس code generator در کانستراکتور آن یک map از شماره به آبجکت مربوطه ایجاد شده است و همچنین در تابع semanticFunction با گرفتن عملکرد خواسته شده همان تابع execute action را صدا می زنیم. در شکل زیر می توانید کد های تغییر یافته را مشاهده کنید : 
 
+```java
+    public CodeGenerator() {
+        symbolTable = new SymbolTable(getMemory());
+        //TODO
+        numberToAction = new HashMap<>();
+        numberToAction.put(1, new CheckIdAction());
+        numberToAction.put(2, new PidAction());
+        numberToAction.put(3, new FPidAction());
+        numberToAction.put(4, new KPidAction());
+        numberToAction.put(5, new IntPidAction());
+        numberToAction.put(6, new StartCallAction());
+        numberToAction.put(7, new CallAction());
+        numberToAction.put(8, new ArgAction());
+        numberToAction.put(9, new AssignAction());
+        numberToAction.put(10, new AddAction());
+        numberToAction.put(11, new SubAction());
+        numberToAction.put(12, new MultAction());
+        numberToAction.put(13, new LabelAction());
+        numberToAction.put(14, new SaveAction());
+        numberToAction.put(15, new WhileAction());
+        numberToAction.put(16, new JpfSaveAction());
+        numberToAction.put(17, new JpHereAction());
+        numberToAction.put(18, new PrintAction());
+        numberToAction.put(19, new EqualAction());
+        numberToAction.put(20, new LessThanAction());
+        numberToAction.put(21, new AndAction());
+        numberToAction.put(22, new NotAction());
+        numberToAction.put(23, new DefClassAction());
+        numberToAction.put(24, new DefMethodAction());
+        numberToAction.put(25, new PopClassAction());
+        numberToAction.put(26, new ExtendAction());
+        numberToAction.put(27, new DefFieldAction());
+        numberToAction.put(28, new DefVarAction());
+        numberToAction.put(29, new MethodReturnAction());
+        numberToAction.put(30, new DefParamAction());
+        numberToAction.put(31, new LastTypeBoolAction());
+        numberToAction.put(32, new LastTypeIntAction());
+        numberToAction.put(33, new DefMainAction());
+    }
+```
+```java
+    public void semanticFunction(int func, Token next) {
+        Log.print("codegenerator : " + func);
+        Action action = numberToAction.get(func);
+        if(action != null){
+            action.executeAction(this, next);
+        }
+    }
+```
 ### separate query from modifier
 در متدهای زیر مقدار یک متغیر هم دارد تغییر می‌کند و هم باز گردانده می‌شود:
 ```java
