@@ -5,8 +5,8 @@ import MiniJava.scanner.token.Token;
 
 public class SubAction implements Action {
 
-    @Override
-    public void executeAction(CodeGenerator codeGenerator, Token next) {
-        codeGenerator.sub();
-    }
+	@Override
+	public void executeAction(CodeGenerator codeGenerator, Token next) {
+		codeGenerator.sub();
+	}
 }

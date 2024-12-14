@@ -5,5 +5,5 @@ package MiniJava.codeGenerator;
  */
 
 public enum varType {
-    Int, Bool, Non, Address
+	Int, Bool, Non, Address
 }

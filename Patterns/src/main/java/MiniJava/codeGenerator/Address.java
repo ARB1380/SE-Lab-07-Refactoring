@@ -5,37 +5,37 @@ package MiniJava.codeGenerator;
  */
 
 public class Address {
-    public int num;
-    public TypeAddress Type;
-    public varType varType;
+	public int num;
+	public TypeAddress Type;
+	public varType varType;
 
-    public Address(int num, varType varType, TypeAddress Type) {
-        this.num = num;
-        this.Type = Type;
-        this.varType = varType;
-    }
+	public Address(int num, varType varType, TypeAddress Type) {
+		this.num = num;
+		this.Type = Type;
+		this.varType = varType;
+	}
 
-    public Address(int num, varType varType) {
-        this.num = num;
-        this.Type = TypeAddress.Direct;
-        this.varType = varType;
-    }
+	public Address(int num, varType varType) {
+		this.num = num;
+		this.Type = TypeAddress.Direct;
+		this.varType = varType;
+	}
 
-    public static Address createTempAddress(Memory memory, varType varType) {
-        int temp = memory.getTemp();
-        memory.updateTemp();
-        return new Address(temp, varType);
-    }
+	public static Address createTempAddress(Memory memory, varType varType) {
+		int temp = memory.getTemp();
+		memory.updateTemp();
+		return new Address(temp, varType);
+	}
 
-    public String toString() {
-        switch (Type) {
-            case Direct:
-                return num + "";
-            case Indirect:
-                return "@" + num;
-            case Imidiate:
-                return "#" + num;
-        }
-        return num + "";
-    }
+	public String toString() {
+		switch (Type) {
+			case Direct :
+				return num + "";
+			case Indirect :
+				return "@" + num;
+			case Imidiate :
+				return "#" + num;
+		}
+		return num + "";
+	}
 }
